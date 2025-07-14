@@ -13,7 +13,7 @@ random.seed(42)
 
 
 def train_tokenizer():
-    # 读取JSONL文件并提取文本数据
+    # 读取JSONL(json line,每一行都是一个json)文件并提取文本数据
     def read_texts_from_jsonl(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -23,8 +23,8 @@ def train_tokenizer():
     data_path = '../dataset/pretrain_hq.jsonl'
 
     # 初始化tokenizer
-    tokenizer = Tokenizer(models.BPE())
-    tokenizer.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)
+    tokenizer = Tokenizer(models.BPE()) # 实例化基于BPE算法分词的分词器
+    tokenizer.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False) # 使用预分词器，保证没有分词比预分词器比返回的单词更大
 
     # 定义特殊token
     special_tokens = ["<|endoftext|>", "<|im_start|>", "<|im_end|>"]
@@ -57,7 +57,7 @@ def train_tokenizer():
     tokenizer.save(os.path.join(tokenizer_dir, "tokenizer.json"))
     tokenizer.model.save("../model/")
 
-    # 手动创建配置文件
+    # 手动创建tokenizer的元数据配置文件，确保可以通过Huggingface的api来加载使用
     config = {
         "add_bos_token": False,
         "add_eos_token": False,
@@ -102,7 +102,7 @@ def train_tokenizer():
         "chat_template": "{% if messages[0]['role'] == 'system' %}{% set system_message = messages[0]['content'] %}{{ '<|im_start|>system\\n' + system_message + '<|im_end|>\\n' }}{% else %}{{ '<|im_start|>system\\nYou are a helpful assistant<|im_end|>\\n' }}{% endif %}{% for message in messages %}{% set content = message['content'] %}{% if message['role'] == 'user' %}{{ '<|im_start|>user\\n' + content + '<|im_end|>\\n<|im_start|>assistant\\n' }}{% elif message['role'] == 'assistant' %}{{ content + '<|im_end|>' + '\\n' }}{% endif %}{% endfor %}"
     }
 
-    # 保存配置文件
+    # 保存tokenizer的元数据配置文件
     with open(os.path.join(tokenizer_dir, "tokenizer_config.json"), "w", encoding="utf-8") as config_file:
         json.dump(config, config_file, ensure_ascii=False, indent=4)
 

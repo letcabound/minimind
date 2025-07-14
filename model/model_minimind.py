@@ -128,7 +128,7 @@ class Attention(nn.Module):
     def __init__(self, args: MiniMindConfig):
         super().__init__()
         self.num_key_value_heads = args.num_attention_heads if args.num_key_value_heads is None else args.num_key_value_heads
-        assert args.num_attention_heads % self.num_key_value_heads == 0
+        assert args.num_attention_heads % self.num_key_value_heads == 0  # 确保组查询，能够整除
         self.n_local_heads = args.num_attention_heads
         self.n_local_kv_heads = self.num_key_value_heads
         self.n_rep = self.n_local_heads // self.n_local_kv_heads
